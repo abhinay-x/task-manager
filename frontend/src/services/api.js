@@ -1,0 +1,24 @@
+import axios from 'axios';
+
+const API = axios.create({ baseURL: 'http://localhost:5000/api/v1' });
+
+API.interceptors.request.use((req) => {
+  if (localStorage.getItem('userInfo')) {
+    req.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem('userInfo')).token}`;
+  }
+  return req;
+});
+
+export const signup = (formData) => API.post('/auth/signup', formData);
+export const login = (formData) => API.post('/auth/login', formData);
+
+export const getMe = () => API.get('/me');
+export const updateMe = (formData) => API.put('/me', formData);
+
+export const getTasks = () => API.get('/tasks');
+export const createTask = (taskData) => API.post('/tasks', taskData);
+export const getTaskById = (id) => API.get(`/tasks/${id}`);
+export const updateTask = (id, taskData) => API.put(`/tasks/${id}`, taskData);
+export const deleteTask = (id) => API.delete(`/tasks/${id}`);
+
+export default API;
