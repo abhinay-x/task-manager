@@ -17,6 +17,7 @@ const getMe = async (req, res, next) => {
 
 const updateMe = async (req, res, next) => {
   try {
+    console.log('updateMe called with body:', req.body);
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -24,8 +25,17 @@ const updateMe = async (req, res, next) => {
       throw new Error('User not found');
     }
 
-    user.name = req.body.name ?? user.name;
-    user.email = req.body.email ?? user.email;
+    const incomingName = req.body.name?.trim();
+    const incomingEmail = req.body.email?.trim();
+
+    if (incomingEmail && incomingEmail !== user.email) {
+      res.status(400);
+      throw new Error('Email updates are not allowed.');
+    }
+
+    if (incomingName) {
+      user.name = incomingName;
+    }
 
     const updatedUser = await user.save();
 
@@ -35,6 +45,7 @@ const updateMe = async (req, res, next) => {
       email: updatedUser.email,
     });
   } catch (error) {
+    console.error('updateMe error:', error);
     next(error);
   }
 };

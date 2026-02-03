@@ -8,6 +8,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({ total: 0, completed: 0, active: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
+  const [showEmailHint, setShowEmailHint] = useState(false);
 
   const computeStats = (tasks = []) => {
     const total = tasks.length;
@@ -138,18 +139,44 @@ const Profile = () => {
           <label className="floating-label">Full Name</label>
         </div>
 
-        <div className="field" data-filled={Boolean(formData.email)}>
+        <div
+          className="field relative"
+          data-filled={Boolean(formData.email)}
+          onMouseEnter={() => setShowEmailHint(true)}
+          onMouseLeave={() => setShowEmailHint(false)}
+        >
           <input
             type="email"
             name="email"
             value={formData.email}
-            onChange={handleChange}
-            className="input-glass"
+            readOnly
+            className="input-glass cursor-not-allowed opacity-80 pr-12"
             placeholder=" "
             required
+            onFocus={() => setShowEmailHint(true)}
+            onBlur={() => setShowEmailHint(false)}
           />
           <label className="floating-label">Email Address</label>
+          <button
+            type="button"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-secondary transition-colors"
+            onFocus={() => setShowEmailHint(true)}
+            onBlur={() => setShowEmailHint(false)}
+            onMouseEnter={() => setShowEmailHint(true)}
+            onMouseLeave={() => setShowEmailHint(false)}
+            tabIndex={-1}
+            aria-hidden="true"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15l-3.5-3.5m0 0L12 8m-3.5 3.5H19" />
+            </svg>
+          </button>
         </div>
+        <p
+          className={`text-xs text-muted transition-opacity duration-200 mt-1 ${showEmailHint ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        >
+          Email updates are managed by support — contact admin to change.
+        </p>
 
         <button
           type="submit"
