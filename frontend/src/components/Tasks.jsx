@@ -40,18 +40,26 @@ const Tasks = () => {
     return () => clearInterval(intervalId);
   }, [fetchTasks]);
 
+  const [error, setError] = useState('');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoadingState(true);
+    setError('');
     const taskData = { title, description, status, priority, dueDate };
-    if (editingTask) {
-      await updateTask(editingTask._id, taskData);
-    } else {
-      await createTask(taskData);
+    try {
+      if (editingTask) {
+        await updateTask(editingTask._id, taskData);
+      } else {
+        await createTask(taskData);
+      }
+      await fetchTasks();
+      resetForm();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save task');
+    } finally {
+      setLoadingState(false);
     }
-    await fetchTasks();
-    resetForm();
-    setLoadingState(false);
   };
 
   const resetForm = () => {
@@ -140,6 +148,12 @@ const Tasks = () => {
                 </svg>
               </button>
             </div>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg animate-slide-up">
+                <p className="text-red-400 text-sm text-center">{error}</p>
+              </div>
+            )}
 
             <div className="field">
               <input
